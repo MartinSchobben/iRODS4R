@@ -205,8 +205,8 @@ Note
 <p>This article is about the release of <code>rirods</code> 0.2.0 (see the <a href="http://rirods.irods4r.org">documentation</a>). iRODS C++ HTTP 0.2.0 is a requirement for this R package.</p>
 </div>
 </div>
-<p>As of November 2023 <a href="https://irods.org">iRODS</a> has released the <a href="https://irods.org/2023/11/initial-release-of-the-irods-http-api/">iRODS C++ HTTP API</a>, as a replacement of the old <a href="https://github.com/irods/irods_client_rest_cpp">iRODS C++ REST API</a>. This new interface to the iRODS server comes with a host of improvements including flexibility of management for all types of operations on users, collections and data objects, as well as supporting authentication with <a href="https://openid.net/developers/how-connect-works/">OpenID Connect</a>. The package is steadily maturing, so it was about time to leverage this functionality with <code>rirods</code>.</p>
-<p>Besides a lot of potential for future rirods development in terms of iRODS operations, this new release (rirods 0.2.0) ensures some obvious improvements on the same core functionality as in previous releases of rirods. In this blog we will showcase one of those improvements; the speed of uploading and downloading of files to iRODS. The new HTTP API can now be configured to allow receiving of much larger payloads than the previous REST API. An example of how this configuration in the form of a JSON file can be set can be seen <a href="https://github.com/irods/irods_demo/blob/main/irods_client_http_api/config.json">here</a>. On top of that write requests can now be made in parallel, which can again be manually configured for the number of allowed threads.</p>
+<p>As of November 2023 <a href="https://irods.org">iRODS</a> has released the <a href="https://irods.org/2023/11/initial-release-of-the-irods-http-api/">iRODS C++ HTTP API</a>, as a replacement of the old <a href="https://github.com/irods/irods_client_rest_cpp">iRODS C++ REST API</a>. This new interface to the iRODS server comes with a host of improvements including flexibility of management for all types of operations on users, collections and data objects, as well as supporting authentication with <a href="https://openid.net/developers/how-connect-works/">OpenID Connect</a>. The HTTP API is steadily maturing, so it was about time to leverage this functionality with <code>rirods</code>.</p>
+<p>Besides a lot of potential for future rirods development in terms of iRODS operations, this new release (rirods 0.2.0) ensures some obvious improvements on the same core functionality as in previous releases of rirods. In this blog we will showcase one of those improvements—the speed of uploading and downloading of files to iRODS. The new HTTP API can now be configured to allow receiving of much larger payloads. An example of how the HTTP API can be configured with a JSON file can be seen <a href="https://github.com/irods/irods_demo/blob/main/irods_client_http_api/config.json">here</a>. On top of that, write requests can now be made in parallel, which can as well be configured for the number of allowed threads.</p>
 <p>In order to benchmark this improvement we show upload and download time as well as memory usage for <code>iget()</code> and <code>iput()</code>, respectively. We use the Docker based <a href="https://github.com/irods/irods_demo">iRODS demo</a> as our server. We can easily stand this server up, as follows:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rirods)</span>
@@ -242,7 +242,7 @@ iauth("rods", "rods")</code></pre>
 </div>
 </div>
 </div>
-<p>These files are then transferred to the demo server with <code>iput()</code> and subsequently retrieved with <code>iget()</code>, while comparing rirods 0.1.2 and 0.2.0. This is repeated 100 times and performance was monitored with the R package <a href="https://bench.r-lib.org/"><code>bench</code></a>. We can see that the newer version shows a drastic improvement for file transfers in both directions (<a href="#fig-time">Figure&nbsp;2</a>). This was to be expected as the older <code>rirods</code> package version needed to chop up the file before transferring chunk-by-chunk to the server at relatively small file sizes (Kb range). As this all took place in R, this was necessarily slow.</p>
+<p>These files are then transferred to the demo server with <code>iput()</code> and subsequently retrieved with <code>iget()</code>, while comparing rirods 0.1.2 and 0.2.0. This is repeated 100 times and performance was monitored with the R package <a href="https://bench.r-lib.org/"><code>bench</code></a>. We can see that the newer version shows a drastic improvement for file transfers in both directions (<a href="#fig-time">Figure&nbsp;2</a>). This was to be expected as the older <code>rirods</code> package version needed to chop up the file before transferring it chunk-by-chunk to the server at relatively small file sizes (Kb range). As this all took place in R, this was necessarily slow.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-time" class="quarto-figure quarto-figure-center anchored">
@@ -253,7 +253,7 @@ iauth("rods", "rods")</code></pre>
 </div>
 </div>
 </div>
-<p>The same can be said for the memory allocated to up- and download files to iRODS, which improve in the newer version of rirods (<a href="#fig-mem">Figure&nbsp;3</a>). We see that above the threshold for file transfers configured server-side imposes a little more strain on the system above 8 Mb, as we also need to chop the file in pieces in these instances.</p>
+<p>The same can be said for the memory allocated to up- and download files to iRODS, which improves in the newer version of rirods (<a href="#fig-mem">Figure&nbsp;3</a>). We see that above the threshold for file transfers configured server-side imposes a little more strain on the system above 8 Mb, as we also need to chop the file in pieces in these instances.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div id="fig-mem" class="quarto-figure quarto-figure-center anchored">
@@ -264,7 +264,7 @@ iauth("rods", "rods")</code></pre>
 </div>
 </div>
 </div>
-<p>Increased write and read operations are an obvious improvement when using rirods 0.2.0 and the iRODS HTTP API has a lot of potential to add even more functionality in the future. Read more about the changes in some of functions interfaces in the <a href="https://rirods.irods4r.org/news/index.html">changelog</a>. Contributions to the package are warmly welcomed. Please report issues and make pull requests in the GitHub repository of <a href="https://github.com/irods/irods_client_library_rirods">rirods</a>.</p>
+<p>Increased write and read operations are an obvious improvement when using rirods 0.2.0 and the iRODS HTTP API has a lot of potential to add even more functionality to rirods in the future. Read more about the changes in some of the functions interfaces in the <a href="https://rirods.irods4r.org/news/index.html">changelog</a>. Contributions to the package are warmly welcomed. Please report issues and make pull requests in the GitHub repository of <a href="https://github.com/irods/irods_client_library_rirods">rirods</a>.</p>
 <p>The following table list all of the benchmark results.</p>
 <div class="cell">
 <div class="cell-output-display">
